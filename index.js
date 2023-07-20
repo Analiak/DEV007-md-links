@@ -42,8 +42,8 @@ const mdLinks = (parameterPath, Options) => {
     // si la ruta no existe da error
     console.log("la ruta no existe");
 
-    // throw new Error("El archivo no existe");
-    return false;
+    throw new Error("El archivo no existe");
+    //return false;
   }
 };
 
@@ -69,8 +69,9 @@ const extractLinksFromMd = (fileContent) => {
 };
 
 
+
 module.exports = {
   mdLinks,
 };
 
-mdLinks(process.argv[2]);
+//mdLinks(process.argv[2]);
