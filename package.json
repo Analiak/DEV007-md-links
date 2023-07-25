@@ -19,6 +19,7 @@
     "test": "jest --coverage"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "eslint-config-airbnb": "^19.0.4"
   },
   "description": "## Índice",
@@ -29,6 +30,4 @@
   "keywords": [],
   "author": "",
   "license": "ISC"
-
-  
 }
