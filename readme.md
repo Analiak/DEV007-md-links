@@ -20,5 +20,5 @@ algunas estadísticas.
 ![links](https:www.malformada.com)
 ![links](https://www.noexisteurl.com/)
 ![google](https://wwww.youtube.com)
-![google](https:wwww.analiaklein.com)
+![este es un texto largo que debe ser truncado por la librería](https:wwww.analiaklein.com)
 
