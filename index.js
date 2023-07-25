@@ -3,9 +3,10 @@
 const path = require("path");
 // importo la libreria fs con el requiere
 const fs = require("fs");
+const { resolve } = require("dns");
 
 // funcion mdLinks
-const mdLinks = (parameterPath, Options) => {
+const mdLinks = async (parameterPath, options = {stats: false, validate: false}) => {
   console.log("Ruta recibida por parámetro:", parameterPath);
 
   // creo la variable donde guardo la ruta absoluta
@@ -35,7 +36,20 @@ const mdLinks = (parameterPath, Options) => {
 
     //console.log(fileContent);
     const linksFound = extractLinksFromMd(fileContent);
-    console.log("links encontrados", linksFound);
+
+    if(options.validate){
+      for (let i=0; i < linksFound.length; i++) {
+        linksFound[i] = await validateLinks(linksFound[i]);
+      }
+    }
+
+    if (options.stats) {
+      if(options.validate){
+        console.log(statsValidateLinks(linksFound));
+      } else {
+        console.log(statsLinks(linksFound));
+      }
+    }
 
     return linksFound;
   } else {
@@ -47,6 +61,7 @@ const mdLinks = (parameterPath, Options) => {
   }
 };
 
+ // funcion para extraer los links
 const extractLinksFromMd = (fileContent) => {
   //esta expresión regular se utiliza para buscar y capturar el texto del enlace y la URL 
   // dentro de un texto que siga el formato de los enlaces en Markdown, 
@@ -68,10 +83,63 @@ const extractLinksFromMd = (fileContent) => {
   return links;
 };
 
+// funcion validate
+const validateLinks = (link) => {
+  return fetch(link.url) 
+    .then(response => {
+      if (response.status >= 200 && response.status < 400) {
+        link.status = response.status;
+        link.ok = 'ok';
+        return link;
+      } else {
+        link.status = response.status;
+        link.ok = 'fail';
+        return link;
+      }
+    })
+    .catch((error) => {
+      link.status = 'Error';
+      link.ok = 'fail';
+      return link;
+    });
+};
+
+const getvalidateLinks = (links) => {
+  return Promise.all(links.map(link => validateLinks(link)));
+};
+
+// funcion stats
+const statsLinks = (links) => {
+  return {
+    Total: links.length,
+    Unique: new Set(links.map((link) => link.href)).size,
+  };
+};
+
+// funcion validate y stats
+const statsValidateLinks = (links) => {
+  const brokenLinks = links.filter(link => link.ok !== 'ok').length;
+  return {
+    Total: links.length,
+    Unique: new Set(links.map((link) => link.href)).size,
+    Broken: brokenLinks
+  };
+};
+
 
 
 module.exports = {
   mdLinks,
 };
 
-//mdLinks(process.argv[2]);
+
+
+
+const archivo = process.argv[2];
+
+const statsOption = process.argv.includes('--stats');
+const validateOption = process.argv.includes('--validate');
+
+mdLinks(archivo, {stats: statsOption, validate: validateOption});
+
+
