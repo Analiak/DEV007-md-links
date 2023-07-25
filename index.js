@@ -3,7 +3,6 @@
 const path = require("path");
 // importo la libreria fs con el requiere
 const fs = require("fs");
-const { resolve } = require("dns");
 
 // funcion mdLinks
 const mdLinks = async (parameterPath, options = {stats: false, validate: false}) => {
@@ -32,24 +31,24 @@ const mdLinks = async (parameterPath, options = {stats: false, validate: false})
       throw new Error("El archivo no es .md");
     }
 
-    const fileContent = fs.readFileSync(absolutPath, "utf-8");
-
     //console.log(fileContent);
-    const linksFound = extractLinksFromMd(fileContent);
+    const linksFound = extractLinksFromMd(absolutPath);
 
     if(options.validate){
       for (let i=0; i < linksFound.length; i++) {
         linksFound[i] = await validateLinks(linksFound[i]);
       }
     }
-
+      console.log(linksFound);
     if (options.stats) {
       if(options.validate){
+        
         console.log(statsValidateLinks(linksFound));
       } else {
         console.log(statsLinks(linksFound));
       }
     }
+    
 
     return linksFound;
   } else {
@@ -62,12 +61,14 @@ const mdLinks = async (parameterPath, options = {stats: false, validate: false})
 };
 
  // funcion para extraer los links
-const extractLinksFromMd = (fileContent) => {
+const extractLinksFromMd = (absolutPath) => {
   //esta expresión regular se utiliza para buscar y capturar el texto del enlace y la URL 
   // dentro de un texto que siga el formato de los enlaces en Markdown, 
   // donde el texto del enlace está entre corchetes [ ] y la URL está entre paréntesis ( )
   // /g: es un modificador global que indica que la búsqueda debe ser global y 
   //no se detiene después de encontrar la primera coincidencia. Esto permite encontrar múltiples enlaces en el texto.
+
+  const fileContent = fs.readFileSync(absolutPath, "utf-8");
 
   const linkRegex = /\[([^\]]+)\]\(([^\)]+)\)/g;
   const links = [];
@@ -77,7 +78,7 @@ const extractLinksFromMd = (fileContent) => {
     const text = match[1];
     const url = match[2];
 
-    links.push({ text, url });
+    links.push({ text, url, file: absolutPath });
   }
 
   return links;

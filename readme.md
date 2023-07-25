@@ -19,3 +19,6 @@ algunas estadísticas.
 ![google](https://wwww.google.com)
 ![links](https:www.malformada.com)
 ![links](https://www.noexisteurl.com/)
+![google](https://wwww.youtube.com)
+![google](https:wwww.analiaklein.com)
+
