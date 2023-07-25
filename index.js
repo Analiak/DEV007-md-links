@@ -3,25 +3,33 @@
 const path = require("path");
 // importo la libreria fs con el requiere
 const fs = require("fs");
-const { resolve } = require("dns");
 
 // funcion mdLinks
-const mdLinks = async (parameterPath, options = {stats: false, validate: false}) => {
-  console.log("Ruta recibida por parámetro:", parameterPath);
+const mdLinks = async (
+  parameterPath,
+  options = { stats: false, validate: false },
+) => {
+  return new Promise((resolve, reject) => {
+    console.log("Ruta recibida por parámetro:", parameterPath);
 
-  // creo la variable donde guardo la ruta absoluta
-  let absolutPath = "";
+    // creo la variable donde guardo la ruta absoluta
+    let absolutPath = "";
 
-  if (path.isAbsolute(parameterPath)) {
-    absolutPath = parameterPath;
-  } else {
-    // con el resolve convierte la ruta en absoluta
-    absolutPath = path.resolve(parameterPath);
-  }
-  console.log("Ruta absoluta:", absolutPath);
+    if (path.isAbsolute(parameterPath)) {
+      absolutPath = parameterPath;
+    } else {
+      // con el resolve convierte la ruta en absoluta
+      absolutPath = path.resolve(parameterPath);
+    }
+    console.log("Ruta absoluta:", absolutPath);
 
-  // verificar si la ruta existe
-  if (fs.existsSync(absolutPath)) {
+    // verificar si la ruta existe
+    if (!fs.existsSync(absolutPath)) {
+      // si la ruta no existe da error
+      console.log("la ruta no existe");
+      return reject("El archivo no existe");
+    }
+
     console.log("la ruta SI existe");
 
     const extensionArray = absolutPath.split(".");
@@ -29,55 +37,52 @@ const mdLinks = async (parameterPath, options = {stats: false, validate: false})
     console.log("Extensión:", extension);
 
     if (extension !== "md") {
-      throw new Error("El archivo no es .md");
+      return reject("El archivo no es .md");
     }
-
-    const fileContent = fs.readFileSync(absolutPath, "utf-8");
 
     //console.log(fileContent);
-    const linksFound = extractLinksFromMd(fileContent);
+    const linksFound = extractLinksFromMd(absolutPath);
 
-    if(options.validate){
-      for (let i=0; i < linksFound.length; i++) {
-        linksFound[i] = await validateLinks(linksFound[i]);
+    if (options.validate) {
+      for (let i = 0; i < linksFound.length; i++) {
+        linksFound[i] = validateLinks(linksFound[i]);
       }
     }
 
-    if (options.stats) {
-      if(options.validate){
-        console.log(statsValidateLinks(linksFound));
-      } else {
-        console.log(statsLinks(linksFound));
+    Promise.all(linksFound).then((linksFound) => {
+      if (options.stats) {
+        // resuelve un objeto con dos propiedades linksfound y stats
+        if (options.validate) {
+          return resolve({ linksFound, stats: statsValidateLinks(linksFound) });
+        } else {
+          return resolve({ linksFound, stats: statsLinks(linksFound) });
+        }
       }
-    }
 
-    return linksFound;
-  } else {
-    // si la ruta no existe da error
-    console.log("la ruta no existe");
-
-    throw new Error("El archivo no existe");
-    //return false;
-  }
+      return resolve({ linksFound });
+    });
+  });
 };
 
- // funcion para extraer los links
-const extractLinksFromMd = (fileContent) => {
-  //esta expresión regular se utiliza para buscar y capturar el texto del enlace y la URL 
-  // dentro de un texto que siga el formato de los enlaces en Markdown, 
+// funcion para extraer los links
+const extractLinksFromMd = (absolutPath) => {
+  //esta expresión regular se utiliza para buscar y capturar el texto del enlace y la URL
+  // dentro de un texto que siga el formato de los enlaces en Markdown,
   // donde el texto del enlace está entre corchetes [ ] y la URL está entre paréntesis ( )
-  // /g: es un modificador global que indica que la búsqueda debe ser global y 
+  // /g: es un modificador global que indica que la búsqueda debe ser global y
   //no se detiene después de encontrar la primera coincidencia. Esto permite encontrar múltiples enlaces en el texto.
+
+  const fileContent = fs.readFileSync(absolutPath, "utf-8");
 
   const linkRegex = /\[([^\]]+)\]\(([^\)]+)\)/g;
   const links = [];
 
   let match;
   while ((match = linkRegex.exec(fileContent)) !== null) {
-    const text = match[1];
+    const text = match[1].slice(0, 49);
     const url = match[2];
 
-    links.push({ text, url });
+    links.push({ text, url, file: absolutPath });
   }
 
   return links;
@@ -85,27 +90,23 @@ const extractLinksFromMd = (fileContent) => {
 
 // funcion validate
 const validateLinks = (link) => {
-  return fetch(link.url) 
-    .then(response => {
+  return fetch(link.url)
+    .then((response) => {
       if (response.status >= 200 && response.status < 400) {
         link.status = response.status;
-        link.ok = 'ok';
+        link.ok = "ok";
         return link;
       } else {
         link.status = response.status;
-        link.ok = 'fail';
+        link.ok = "fail";
         return link;
       }
     })
     .catch((error) => {
-      link.status = 'Error';
-      link.ok = 'fail';
+      link.status = "Error";
+      link.ok = "fail";
       return link;
     });
-};
-
-const getvalidateLinks = (links) => {
-  return Promise.all(links.map(link => validateLinks(link)));
 };
 
 // funcion stats
@@ -118,28 +119,23 @@ const statsLinks = (links) => {
 
 // funcion validate y stats
 const statsValidateLinks = (links) => {
-  const brokenLinks = links.filter(link => link.ok !== 'ok').length;
+  const brokenLinks = links.filter((link) => link.ok !== "ok").length;
   return {
     Total: links.length,
     Unique: new Set(links.map((link) => link.href)).size,
-    Broken: brokenLinks
+    Broken: brokenLinks,
   };
 };
-
-
 
 module.exports = {
   mdLinks,
 };
 
+const filePath = process.argv[2];
 
+const statsOption = process.argv.includes("--stats");
+const validateOption = process.argv.includes("--validate");
 
-
-const archivo = process.argv[2];
-
-const statsOption = process.argv.includes('--stats');
-const validateOption = process.argv.includes('--validate');
-
-mdLinks(archivo, {stats: statsOption, validate: validateOption});
-
-
+mdLinks(filePath, { stats: statsOption, validate: validateOption })
+  .then((result) => console.log(result))
+  .catch((error) => console.log(error));
