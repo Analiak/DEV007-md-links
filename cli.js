@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+// shebang para pode instalar la librería en cualquier sistema operativo
+
 const { mdLinks } = require('./index.js');
 
 const filePath = process.argv[2];
