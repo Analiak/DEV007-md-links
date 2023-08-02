@@ -1,6 +1,6 @@
 {
   "name": "analiaklein-md-links",
-  "version": "0.2.1",
+  "version": "0.2.6",
   "description": "herramienta de línea de comando (CLI) así como tu propia librería (o biblioteca - library) en JavaScript.",
   "main": "index.js",
   "bin": {

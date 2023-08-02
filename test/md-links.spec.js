@@ -10,34 +10,34 @@ describe("mdLinks", () => {
   });
 
   it("debería rechazar cuando el archivo no es .md", () => {
-    mdLinks("./package.json").catch((error) =>
+    mdLinks("./test/prueba.json").catch((error) =>
       expect(error).toBe("El archivo no es .md"),
     );
   });
   it("retorna la cantidad de links", () => {
-    mdLinks("./readme.md").then((result) =>
+    mdLinks("./test/readme.md").then((result) =>
       expect(result.linksFound.length).toBe(8),
     );
   });
 
   it("retorna la cantidad de links cuando se pasa una ruta absoluta", () => {
-    absolutePath = path.resolve("./readme.md");
+    absolutePath = path.resolve("./test/readme.md");
     mdLinks(absolutePath).then((result) =>
       expect(result.linksFound.length).toBe(8),
     );
   });
 
   it("retorna stats", () => {
-    mdLinks("./readme.md", { stats: true }).then((result) =>
+    mdLinks("./test/readme.md", { stats: true }).then((result) =>
       expect(result.stats).toEqual({ Total: 8, Unique: 1 }),
     );
   });
   it("retorna formato correcto cuando validate es true", () => {
-    mdLinks("./readme.md", { validate: true }).then((result) =>
+    mdLinks("./test/readme.md", { validate: true }).then((result) =>
       expect(result.linksFound[0]).toEqual({
         text: "Markdown",
         url: "https://es.wikipedia.org/wiki/Markdown",
-        file: "/home/laptop/Documentos/laboratoria/DEV007-md-links/readme.md",
+        file: "/home/laptop/Documentos/laboratoria/DEV007-md-links/test/readme.md",
         status: 200,
         ok: "ok",
       }),
@@ -45,7 +45,7 @@ describe("mdLinks", () => {
   });
 
   it("validate y stats con valor true", () => {
-    mdLinks("./readme.md", { stats: true, validate: true }).then((result) =>
+    mdLinks("./test/readme.md", { stats: true, validate: true }).then((result) =>
       expect(result.stats).toEqual({ Total: 8, Unique: 1, Broken: 5 }),
     );
   });
