@@ -2,7 +2,7 @@
 const statsLinks = (links) => {
   return {
     Total: links.length,
-    Unique: new Set(links.map((link) => link.href)).size,
+    Unique: new Set(links.map((link) => link.url)).size,
   };
 };
 
@@ -29,11 +29,11 @@ const validateLinks = (link) => {
 
 // funcion validate y stats
 const statsValidateLinks = (links) => {
-  const brokenLinks = links.filter((link) => link.ok !== "ok").length;
+  const brokenLinks = links.filter((link) => link.ok !== "ok");
   return {
     Total: links.length,
-    Unique: new Set(links.map((link) => link.href)).size,
-    Broken: brokenLinks,
+    Unique: new Set(links.map((link) => link.url)).size,
+    Broken: brokenLinks.length,
   };
 };
 

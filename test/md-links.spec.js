@@ -29,7 +29,7 @@ describe("mdLinks", () => {
 
   it("retorna stats", () => {
     mdLinks("./test/readme.md", { stats: true }).then((result) =>
-      expect(result.stats).toEqual({ Total: 8, Unique: 1 }),
+      expect(result.stats).toEqual({ Total: 8, Unique: 7 }),
     );
   });
   it("retorna formato correcto cuando validate es true", () => {
@@ -46,7 +46,7 @@ describe("mdLinks", () => {
 
   it("validate y stats con valor true", () => {
     mdLinks("./test/readme.md", { stats: true, validate: true }).then((result) =>
-      expect(result.stats).toEqual({ Total: 8, Unique: 1, Broken: 5 }),
+      expect(result.stats).toEqual({ Total: 8, Unique: 7, Broken: 5 }),
     );
   });
 });

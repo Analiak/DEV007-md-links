@@ -13,17 +13,17 @@ describe("statsValidateLinks", () => {
 
   it("debe retornar stats con formato correcto", () => {
     const links = [
-      { href: "https://es.wikipedia.org/wiki/Markdown", ok: "ok" },
-      { href: "https://nodejs.org/", ok: "ok" },
+      { url: "https://es.wikipedia.org/wiki/Markdown", ok: "ok" },
+      { url: "https://nodejs.org/", ok: "ok" },
       {
-        href: "https://user-images.githubusercontent.com/110297/42118443-b7a5f1f0-7bc8-11e8-96ad-9cc5593715a6.jpg",
+        url: "https://user-images.githubusercontent.com/110297/42118443-b7a5f1f0-7bc8-11e8-96ad-9cc5593715a6.jpg",
         ok: "ok",
       },
-      { href: "https://wwww.google.com", ok: "fail" },
-      { href: "https:www.malformada.com", ok: "fail" },
-      { href: "https:www.malformada.com", ok: "fail" },
-      { href: "https://wwww.youtube.com", ok: "fail" },
-      { href: "https:wwww.analiaklein.com", ok: "fail" },
+      { url: "https://wwww.google.com", ok: "fail" },
+      { url: "https:www.malformada.com", ok: "fail" },
+      { url: "https:www.malformada.com", ok: "fail" },
+      { url: "https://wwww.youtube.com", ok: "fail" },
+      { url: "https:wwww.analiaklein.com", ok: "fail" },
     ];
 
     const result = statsLinks(links);
@@ -33,17 +33,17 @@ describe("statsValidateLinks", () => {
 
   it("deberia retornar stats con formato correcto y validaciones", () => {
     const links = [
-      { href: "https://es.wikipedia.org/wiki/Markdown", ok: "ok" },
-      { href: "https://nodejs.org/", ok: "ok" },
+      { url: "https://es.wikipedia.org/wiki/Markdown", ok: "ok" },
+      { url: "https://nodejs.org/", ok: "ok" },
       {
-        href: "https://user-images.githubusercontent.com/110297/42118443-b7a5f1f0-7bc8-11e8-96ad-9cc5593715a6.jpg",
+        url: "https://user-images.githubusercontent.com/110297/42118443-b7a5f1f0-7bc8-11e8-96ad-9cc5593715a6.jpg",
         ok: "ok",
       },
-      { href: "https://wwww.google.com", ok: "fail" },
-      { href: "https:www.malformada.com", ok: "fail" },
-      { href: "https:www.malformada.com", ok: "fail" },
-      { href: "https://wwww.youtube.com", ok: "fail" },
-      { href: "https:wwww.analiaklein.com", ok: "fail" },
+      { url: "https://wwww.google.com", ok: "fail" },
+      { url: "https:www.malformada.com", ok: "fail" },
+      { url: "https:www.malformada.com", ok: "fail" },
+      { url: "https://wwww.youtube.com", ok: "fail" },
+      { url: "https:wwww.analiaklein.com", ok: "fail" },
     ];
 
     const result = statsValidateLinks(links);
